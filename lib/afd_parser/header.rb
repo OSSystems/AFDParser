@@ -17,7 +17,7 @@
 # Rua Clóvis Gularte Candiota 132, Pelotas-RS, Brasil.
 # e-mail: contato@ossystems.com.br
 
-require 'lib/afd_parser/record_parser'
+require 'afd_parser/record_parser'
 
 class AfdParser
   class Header < RecordParser

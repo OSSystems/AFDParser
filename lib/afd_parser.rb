@@ -19,12 +19,12 @@
 
 require 'date'
 
-require 'lib/afd_parser/clock_in_out'
-require 'lib/afd_parser/header'
-require 'lib/afd_parser/set_employee'
-require 'lib/afd_parser/set_employer'
-require 'lib/afd_parser/set_time'
-require 'lib/afd_parser/trailer'
+require 'afd_parser/clock_in_out'
+require 'afd_parser/header'
+require 'afd_parser/set_employee'
+require 'afd_parser/set_employer'
+require 'afd_parser/set_time'
+require 'afd_parser/trailer'
 
 # Parser para a PORTARIA No 1.510, DE 21 DE AGOSTO DE 2009, do
 # Ministério do Trabalho;

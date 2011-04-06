@@ -19,7 +19,7 @@
 
 require 'test_helper'
 require 'tempfile'
-require 'lib/afd_parser'
+require 'afd_parser'
 
 class AfdParserTest < Test::Unit::TestCase
   def test_parse_file_one_line_at_the_time
