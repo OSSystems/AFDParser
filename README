@@ -1,0 +1,10 @@
+== AFD PArser
+
+Este é uma gem realizar verificação e parsing de dados de Arquivos Fonte de Dados
+usados em relógios eletrônicos de ponto de acordo com a portaria No 1.510, de 21
+de agosto de 2009, do Ministério do Trabalho; para ser usado em conjunto com o
+sistema de Controle de Horário, desenvolvido pela O.S. Systems.
+
+Veja o arquivo COPYRIGHT para informações de direitos autorais. Se você não
+recebeu este arquivo ao receber este código fonte, por favor comunique o fato à
+O.S. Systems pelo endereço de e-mail "contato@ossystems.com.br".
