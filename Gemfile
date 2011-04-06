@@ -19,8 +19,7 @@
 
 source 'http://rubygems.org'
 
-gem 'rake'
-gem 'jeweler'
+gemspec
 
 group :development, :test do
   gem "ruby-debug"

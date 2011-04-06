@@ -19,6 +19,8 @@
 
 require 'rake'
 require 'rake/testtask'
+require 'bundler'
+Bundler::GemHelper.install_tasks
 
 desc 'Default: run unit tests.'
 task :default => :test
@@ -26,19 +28,4 @@ task :default => :test
 Rake::TestTask.new(:test) do |t|
   t.libs << 'test'
   t.pattern = 'test/**/*_test.rb'
-end
-
-begin
-  require "jeweler"
-  Jeweler::Tasks.new do |gem|
-    gem.name = "afd_parser"
-    gem.summary = "Gem to parse AFDs from REPs"
-    gem.description = "Use this gem to verify and parse data files generated from REPs."
-    gem.authors = ["O.S. Systems Softwares Ltda."]
-    gem.email = "contato@ossystems.com.br"
-    gem.homepage = "http://www.ossystems.com.br/"
-    gem.files = Dir["{lib}/**/*", "{app}/**/*", "{config}/**/*"]
-  end
-rescue
-  puts "Jeweler or one of its dependencies is not installed."
 end
