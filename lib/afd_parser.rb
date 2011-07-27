@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Controle de Horas - Sistema para gestão de horas trabalhadas
 # Copyright (C) 2009  O.S. Systems Softwares Ltda.
 
@@ -116,15 +117,23 @@ class AfdParser
   end
 
   def first_creation_date
-    unless @records.empty?
-      time = @records.first.creation_time
+    record = @records.detect{|r| r.class != AfdParser::Header && r.class != AfdParser::Trailer}
+    if record
+      time = record.creation_time
       return Date.civil(time.year, time.month, time.day)
     end
   end
 
   def last_creation_date
-    unless @records.empty?
-      time = @records.last.creation_time
+    record = nil
+    @records.reverse_each do |r|
+      if r.class != AfdParser::Header && r.class != AfdParser::Trailer
+        record = r
+        break
+      end
+    end
+    if record
+      time = record.creation_time
       return Date.civil(time.year, time.month, time.day)
     end
   end

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Controle de Horas - Sistema para gestão de horas trabalhadas
 # Copyright (C) 2009  O.S. Systems Softwares Ltda.
 
@@ -340,6 +341,35 @@ class AfdParserTest < Test::Unit::TestCase
     end
     assert_equal "Mismatch counting changes of set_employee in REP!\nREP: 2 | System: 0", exception.message
   end
+
+  def test_first_creation_date
+    parser = AfdParser.new(true)
+    assert_nil parser.first_creation_date
+
+    file = File.open("test/afd_file", "r")
+    file.readlines.each_with_index do |line, index|
+      parser.parse_line(line, index)
+    end
+
+    assert_equal Date.civil(2011,1,28), parser.first_creation_date
+
+    # unless @records.empty?
+    #   time = @records.first.creation_time
+    #   return Date.civil(time.year, time.month, time.day)
+    # end
+  end
+
+  def test_last_creation_date
+    parser = AfdParser.new(true)
+    assert_nil parser.last_creation_date
+
+    file = File.open("test/afd_file", "r")
+    file.readlines.each_with_index do |line, index|
+      parser.parse_line(line, index)
+    end
+
+    assert_equal Date.civil(2011,2,21), parser.last_creation_date
+ end
 
   private
   def create_temp_afd_file(data)
