@@ -138,6 +138,10 @@ class AfdParser
     end
   end
 
+  def ==(other)
+    return self.class == other.class && @records == other.records
+  end
+
   private
   def initialize_variables(validate_structure)
     @records = []
@@ -184,7 +188,6 @@ class AfdParser
     if header_found? and record_type == :header
       raise AfdParserException.new("Unexpected second AFD header found, line #{index.to_s}: '#{line}'")
     end
-
   end
 
   def header_found?

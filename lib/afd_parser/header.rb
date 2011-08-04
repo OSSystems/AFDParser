@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Controle de Horas - Sistema para gestão de horas trabalhadas
 # Copyright (C) 2009  O.S. Systems Softwares Ltda.
 
@@ -65,6 +66,12 @@ class AfdParser
 
     def self.size
       232
+    end
+
+    def ==(other)
+      return self.class == other.class && [:line_id, :record_type_id, :employer_type, :employer_document, :employer_cei, :employer_name, :rep_serial_number, :afd_start_date, :afd_end_date, :afd_creation_time].all? do |reader|
+        self.send(reader) == other.send(reader)
+      end
     end
 
     private

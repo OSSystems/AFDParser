@@ -366,6 +366,36 @@ class AfdParserTest < Test::Unit::TestCase
     assert_equal Date.civil(2011,2,21), parser.last_creation_date
  end
 
+  def test_equal
+    parser1 = AfdParser.new(true)
+    file = File.open("test/afd_file", "r")
+    file.readlines.each_with_index do |line, index|
+      parser1.parse_line(line, index)
+    end
+
+    parser2 = AfdParser.new(true)
+    file = File.open("test/afd_file", "r")
+    file.readlines.each_with_index do |line, index|
+      parser2.parse_line(line, index)
+    end
+    assert_equal parser2, parser1
+
+    different_data = ["0000000001100000000067890000000009876RAZAO_SOCIAL                                                                                                                                          000040000700044032001201122022011210220111048",
+                      "0000000014280120111112280120111113",
+                      "0000000022270120111756108682040000172000000000000O.S. SYSTEMS SOFTWARES LTDA.                                                                                                                          PELOTAS - RS                                                                                        ",
+                      "0000000035270120111759I111111111111TESTE 1 2 3                                         ",
+                      "0000000045110220111723E222222222222TESTE 2                                             ",
+                      "0000000053210220111134111111111111",
+                      "9999999990000000010000000010000000010000000029"]
+
+    parser2 = AfdParser.new(true)
+    file = File.open("test/afd_file", "r")
+    different_data.each_with_index do |line, index|
+      parser2.parse_line(line, index)
+    end
+    assert_not_equal parser2, parser1
+  end
+
   private
   def create_temp_afd_file(data)
     file = Tempfile.new('afd_error')
