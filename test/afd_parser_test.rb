@@ -352,11 +352,6 @@ class AfdParserTest < Test::Unit::TestCase
     end
 
     assert_equal Date.civil(2011,1,28), parser.first_creation_date
-
-    # unless @records.empty?
-    #   time = @records.first.creation_time
-    #   return Date.civil(time.year, time.month, time.day)
-    # end
   end
 
   def test_last_creation_date
