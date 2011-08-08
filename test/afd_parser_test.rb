@@ -29,28 +29,29 @@ class AfdParserTest < Test::Unit::TestCase
     file.readlines.each_with_index do |line, index|
       parser.parse_line(line, index)
     end
+    file.close
 
     parsed_records = parser.records
+    assert_equal 9, parsed_records.size
 
-    header = parsed_records[0]
-    assert_equal 0, header.line_id
-    assert_equal 1, header.record_type_id
-    assert_equal :cnpj, header.employer_type
-    assert_equal Time.local(2011,2,21,10,48), header.afd_creation_time
-    assert_equal Date.civil(2011,1,20), header.afd_start_date
-    assert_equal Date.civil(2011,2,22), header.afd_end_date
-    assert_equal "00004000070004403", header.rep_serial_number
-    assert_equal "RAZAO_SOCIAL", header.employer_name
-    assert_equal 67890, header.employer_document
-    assert_equal 9876, header.employer_cei
+    assert_equal 0, parser.header.line_id
+    assert_equal 1, parser.header.record_type_id
+    assert_equal :cnpj, parser.header.employer_type
+    assert_equal Time.local(2011,2,21,10,48), parser.header.afd_creation_time
+    assert_equal Date.civil(2011,1,20), parser.header.afd_start_date
+    assert_equal Date.civil(2011,2,22), parser.header.afd_end_date
+    assert_equal "00004000070004403", parser.header.rep_serial_number
+    assert_equal "RAZAO_SOCIAL", parser.header.employer_name
+    assert_equal 67890, parser.header.employer_document
+    assert_equal 9876, parser.header.employer_cei
 
-    set_time = parsed_records[1]
+    set_time = parsed_records[0]
     assert_equal 1, set_time.line_id
     assert_equal Time.local(2011,1,28,11,13), set_time.after_time
     assert_equal Time.local(2011,1,28,11,12), set_time.before_time
     assert_equal 4, set_time.record_type_id
 
-    set_employer = parsed_records[2]
+    set_employer = parsed_records[1]
     assert_equal 8682040000172, set_employer.document_number
     assert_equal 2, set_employer.line_id
     assert_equal "PELOTAS - RS", set_employer.location
@@ -60,7 +61,7 @@ class AfdParserTest < Test::Unit::TestCase
     assert_equal "O.S. SYSTEMS SOFTWARES LTDA.", set_employer.name
     assert_equal 2, set_employer.record_type_id
 
-    set_employee = parsed_records[3]
+    set_employee = parsed_records[2]
     assert_equal 111111111111, set_employee.pis
     assert_equal 3, set_employee.line_id
     assert_equal :add, set_employee.operation_type
@@ -68,7 +69,7 @@ class AfdParserTest < Test::Unit::TestCase
     assert_equal "TESTE 1 2 3", set_employee.name
     assert_equal 5, set_employee.record_type_id
 
-    set_employee = parsed_records[4]
+    set_employee = parsed_records[3]
     assert_equal 222222222222, set_employee.pis
     assert_equal 4, set_employee.line_id
     assert_equal :add, set_employee.operation_type
@@ -76,7 +77,7 @@ class AfdParserTest < Test::Unit::TestCase
     assert_equal "TESTE 2", set_employee.name
     assert_equal 5, set_employee.record_type_id
 
-    set_employee = parsed_records[5]
+    set_employee = parsed_records[4]
     assert_equal 222222222222, set_employee.pis
     assert_equal 5, set_employee.line_id
     assert_equal :edit, set_employee.operation_type
@@ -84,7 +85,7 @@ class AfdParserTest < Test::Unit::TestCase
     assert_equal "TESTE 2", set_employee.name
     assert_equal 5, set_employee.record_type_id
 
-    set_employee = parsed_records[6]
+    set_employee = parsed_records[5]
     assert_equal 222222222222, set_employee.pis
     assert_equal 6, set_employee.line_id
     assert_equal :remove, set_employee.operation_type
@@ -92,31 +93,30 @@ class AfdParserTest < Test::Unit::TestCase
     assert_equal "TESTE 2", set_employee.name
     assert_equal 5, set_employee.record_type_id
 
-    clock_in_out = parsed_records[7]
+    clock_in_out = parsed_records[6]
     assert_equal 111111111111, clock_in_out.pis
     assert_equal 7, clock_in_out.line_id
     assert_equal Time.local(2011,2,19,18,14), clock_in_out.creation_time
     assert_equal 3, clock_in_out.record_type_id
 
-    clock_in_out = parsed_records[8]
+    clock_in_out = parsed_records[7]
     assert_equal 111111111111, clock_in_out.pis
     assert_equal 8, clock_in_out.line_id
     assert_equal Time.local(2011,2,21,11,33), clock_in_out.creation_time
     assert_equal 3, clock_in_out.record_type_id
 
-    clock_in_out = parsed_records[9]
+    clock_in_out = parsed_records[8]
     assert_equal 111111111111, clock_in_out.pis
     assert_equal 9, clock_in_out.line_id
     assert_equal Time.local(2011,2,21,11,34), clock_in_out.creation_time
     assert_equal 3, clock_in_out.record_type_id
 
-    trailer = parsed_records[10]
-    assert_equal 3, trailer.clock_in_out
-    assert_equal 999999999, trailer.line_id
-    assert_equal 1, trailer.set_employer
-    assert_equal 4, trailer.set_employee
-    assert_equal 1, trailer.set_time
-    assert_equal 9, trailer.record_type_id
+    assert_equal 3, parser.trailer.clock_in_out
+    assert_equal 999999999, parser.trailer.line_id
+    assert_equal 1, parser.trailer.set_employer
+    assert_equal 4, parser.trailer.set_employee
+    assert_equal 1, parser.trailer.set_time
+    assert_equal 9, parser.trailer.record_type_id
   end
 
   def test_export_simple_file
@@ -137,32 +137,31 @@ class AfdParserTest < Test::Unit::TestCase
     parser.parse_line(line, 1)
     parser.create_trailer
     parsed_records = parser.records
+    assert_equal 1, parsed_records.size
 
-    header = parsed_records[0]
-    assert_equal 0, header.line_id
-    assert_equal 1, header.record_type_id
-    assert_equal :cnpj, header.employer_type
-    assert_equal time, header.afd_creation_time
-    assert_equal Date.today, header.afd_start_date
-    assert_equal Date.today, header.afd_end_date
-    assert_equal "12345678901234567", header.rep_serial_number
-    assert_equal "Company name", header.employer_name
-    assert_equal 12345678901234, header.employer_document
-    assert_equal 0, header.employer_cei
+    assert_equal 0, parser.header.line_id
+    assert_equal 1, parser.header.record_type_id
+    assert_equal :cnpj, parser.header.employer_type
+    assert_equal time, parser.header.afd_creation_time
+    assert_equal Date.today, parser.header.afd_start_date
+    assert_equal Date.today, parser.header.afd_end_date
+    assert_equal "12345678901234567", parser.header.rep_serial_number
+    assert_equal "Company name", parser.header.employer_name
+    assert_equal 12345678901234, parser.header.employer_document
+    assert_equal 0, parser.header.employer_cei
 
-    set_time = parsed_records[1]
+    set_time = parsed_records[0]
     assert_equal 1, set_time.line_id
     assert_equal Time.local(2011,1,28,11,13), set_time.after_time
     assert_equal Time.local(2011,1,28,11,12), set_time.before_time
     assert_equal 4, set_time.record_type_id
 
-    trailer = parsed_records[2]
-    assert_equal 0, trailer.clock_in_out
-    assert_equal 999999999, trailer.line_id
-    assert_equal 0, trailer.set_employer
-    assert_equal 0, trailer.set_employee
-    assert_equal 1, trailer.set_time
-    assert_equal 9, trailer.record_type_id
+    assert_equal 0, parser.trailer.clock_in_out
+    assert_equal 999999999, parser.trailer.line_id
+    assert_equal 0, parser.trailer.set_employer
+    assert_equal 0, parser.trailer.set_employee
+    assert_equal 1, parser.trailer.set_time
+    assert_equal 9, parser.trailer.record_type_id
   end
 
   def test_reject_file_with_out_of_order_line_ids
@@ -350,6 +349,7 @@ class AfdParserTest < Test::Unit::TestCase
     file.readlines.each_with_index do |line, index|
       parser.parse_line(line, index)
     end
+    file.close
 
     assert_equal Date.civil(2011,1,28), parser.first_creation_date
   end
@@ -362,6 +362,7 @@ class AfdParserTest < Test::Unit::TestCase
     file.readlines.each_with_index do |line, index|
       parser.parse_line(line, index)
     end
+    file.close
 
     assert_equal Date.civil(2011,2,21), parser.last_creation_date
  end
@@ -372,12 +373,14 @@ class AfdParserTest < Test::Unit::TestCase
     file.readlines.each_with_index do |line, index|
       parser1.parse_line(line, index)
     end
+    file.close
 
     parser2 = AfdParser.new(true)
     file = File.open("test/afd_file", "r")
     file.readlines.each_with_index do |line, index|
       parser2.parse_line(line, index)
     end
+    file.close
     assert_equal parser2, parser1
 
     different_data = ["0000000001100000000067890000000009876RAZAO_SOCIAL                                                                                                                                          000040000700044032001201122022011210220111048",
@@ -389,11 +392,174 @@ class AfdParserTest < Test::Unit::TestCase
                       "9999999990000000010000000010000000010000000029"]
 
     parser2 = AfdParser.new(true)
-    file = File.open("test/afd_file", "r")
     different_data.each_with_index do |line, index|
       parser2.parse_line(line, index)
     end
     assert_not_equal parser2, parser1
+  end
+
+  def test_get_last_id
+    parser = AfdParser.new(true)
+    assert_nil parser.first_id
+    assert_nil parser.last_id
+
+    parser = AfdParser.new(true)
+    file = File.open("test/afd_file", "r")
+    file.readlines.each_with_index do |line, index|
+      parser.parse_line(line, index)
+    end
+    file.close
+    assert_equal 1, parser.first_id
+    assert_equal 9, parser.last_id
+
+    different_data = [["0000000001100000000067890000000009876NOVISSIMA EMPRESA SA.                                                                                                                                 000040000700044032001201105082011050820111711",0],
+                      ["0000000102270120111756108682040000172000000000000NOVISSIMA EMPRESA SA.                                                                                                                                 PELOTAS - RS                                                                                        ",10],
+                      ["0000000113210220111134111111111111",11]]
+
+    parser = AfdParser.new(true)
+    different_data.each do |line, index|
+      parser.parse_line(line, index)
+    end
+
+    assert_equal 10, parser.first_id
+    assert_equal 11, parser.last_id
+
+    different_data = [["0000000001100000000067890000000009876NOVISSIMA EMPRESA SA.                                                                                                                                 000040000700044032001201105082011050820111711",0],
+                      ["0000000102270120111756108682040000172000000000000NOVISSIMA EMPRESA SA.                                                                                                                                 PELOTAS - RS                                                                                        ",10]]
+
+    parser = AfdParser.new(true)
+    different_data.each do |line, index|
+      parser.parse_line(line, index)
+    end
+
+    assert_equal 10, parser.last_id
+    assert_equal 10, parser.last_id
+  end
+
+  def test_merge
+    parser1 = AfdParser.new(true)
+    file = File.open("test/afd_file", "r")
+    file.readlines.each_with_index do |line, index|
+      parser1.parse_line(line, index)
+    end
+
+    different_data = [["0000000001100000000067890000000009876NOVISSIMA EMPRESA SA.                                                                                                                                 000040000700044032001201105082011050820111711",0],
+                      ["0000000102270120111756108682040000172000000000000NOVISSIMA EMPRESA SA.                                                                                                                                 PELOTAS - RS                                                                                        ",10],
+                      ["0000000113050820111134111111111111",11]]
+
+    parser2 = AfdParser.new(true)
+    exception = assert_raise AfdParser::AfdParserException do
+      parser1.merge parser2
+    end
+    assert_equal "Cannot merge with a empty parser", exception.message
+
+    different_data.each do |line, index|
+      parser2.parse_line(line, index)
+    end
+    parser1.merge parser2
+
+    parsed_records = parser1.records
+    assert_equal 11, parsed_records.size
+
+    assert_equal 0, parser1.header.line_id
+    assert_equal 1, parser1.header.record_type_id
+    assert_equal :cnpj, parser1.header.employer_type
+    assert_equal Time.local(2011,8,5,17,11), parser1.header.afd_creation_time
+    assert_equal Date.civil(2011,1,20), parser1.header.afd_start_date
+    assert_equal Date.civil(2011,8,5), parser1.header.afd_end_date
+    assert_equal "00004000070004403", parser1.header.rep_serial_number
+    assert_equal "NOVISSIMA EMPRESA SA.", parser1.header.employer_name
+    assert_equal 67890, parser1.header.employer_document
+    assert_equal 9876, parser1.header.employer_cei
+
+    set_time = parsed_records[0]
+    assert_equal 1, set_time.line_id
+    assert_equal Time.local(2011,1,28,11,13), set_time.after_time
+    assert_equal Time.local(2011,1,28,11,12), set_time.before_time
+    assert_equal 4, set_time.record_type_id
+
+    set_employer = parsed_records[1]
+    assert_equal 8682040000172, set_employer.document_number
+    assert_equal 2, set_employer.line_id
+    assert_equal "PELOTAS - RS", set_employer.location
+    assert_equal :cnpj, set_employer.document_type
+    assert_equal Time.local(2011,1,27,17,56), set_employer.creation_time
+    assert_equal 0, set_employer.cei
+    assert_equal "O.S. SYSTEMS SOFTWARES LTDA.", set_employer.name
+    assert_equal 2, set_employer.record_type_id
+
+    set_employee = parsed_records[2]
+    assert_equal 111111111111, set_employee.pis
+    assert_equal 3, set_employee.line_id
+    assert_equal :add, set_employee.operation_type
+    assert_equal Time.local(2011,1,27,17,59), set_employee.creation_time
+    assert_equal "TESTE 1 2 3", set_employee.name
+    assert_equal 5, set_employee.record_type_id
+
+    set_employee = parsed_records[3]
+    assert_equal 222222222222, set_employee.pis
+    assert_equal 4, set_employee.line_id
+    assert_equal :add, set_employee.operation_type
+    assert_equal Time.local(2011,2,8,17,9), set_employee.creation_time
+    assert_equal "TESTE 2", set_employee.name
+    assert_equal 5, set_employee.record_type_id
+
+    set_employee = parsed_records[4]
+    assert_equal 222222222222, set_employee.pis
+    assert_equal 5, set_employee.line_id
+    assert_equal :edit, set_employee.operation_type
+    assert_equal Time.local(2011,2,11,17,19), set_employee.creation_time
+    assert_equal "TESTE 2", set_employee.name
+    assert_equal 5, set_employee.record_type_id
+
+    set_employee = parsed_records[5]
+    assert_equal 222222222222, set_employee.pis
+    assert_equal 6, set_employee.line_id
+    assert_equal :remove, set_employee.operation_type
+    assert_equal Time.local(2011,2,11,17,23), set_employee.creation_time
+    assert_equal "TESTE 2", set_employee.name
+    assert_equal 5, set_employee.record_type_id
+
+    clock_in_out = parsed_records[6]
+    assert_equal 111111111111, clock_in_out.pis
+    assert_equal 7, clock_in_out.line_id
+    assert_equal Time.local(2011,2,19,18,14), clock_in_out.creation_time
+    assert_equal 3, clock_in_out.record_type_id
+
+    clock_in_out = parsed_records[7]
+    assert_equal 111111111111, clock_in_out.pis
+    assert_equal 8, clock_in_out.line_id
+    assert_equal Time.local(2011,2,21,11,33), clock_in_out.creation_time
+    assert_equal 3, clock_in_out.record_type_id
+
+    clock_in_out = parsed_records[8]
+    assert_equal 111111111111, clock_in_out.pis
+    assert_equal 9, clock_in_out.line_id
+    assert_equal Time.local(2011,2,21,11,34), clock_in_out.creation_time
+    assert_equal 3, clock_in_out.record_type_id
+
+    set_employer = parsed_records[9]
+    assert_equal 8682040000172, set_employer.document_number
+    assert_equal 10, set_employer.line_id
+    assert_equal "PELOTAS - RS", set_employer.location
+    assert_equal :cnpj, set_employer.document_type
+    assert_equal Time.local(2011,1,27,17,56), set_employer.creation_time
+    assert_equal 0, set_employer.cei
+    assert_equal "NOVISSIMA EMPRESA SA.", set_employer.name
+    assert_equal 2, set_employer.record_type_id
+
+    clock_in_out = parsed_records[10]
+    assert_equal 111111111111, clock_in_out.pis
+    assert_equal 11, clock_in_out.line_id
+    assert_equal Time.local(2011,8,5,11,34), clock_in_out.creation_time
+    assert_equal 3, clock_in_out.record_type_id
+
+    assert_equal 3, parser1.trailer.clock_in_out
+    assert_equal 999999999, parser1.trailer.line_id
+    assert_equal 1, parser1.trailer.set_employer
+    assert_equal 4, parser1.trailer.set_employee
+    assert_equal 1, parser1.trailer.set_time
+    assert_equal 9, parser1.trailer.record_type_id
   end
 
   private

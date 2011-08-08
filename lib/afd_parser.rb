@@ -32,7 +32,7 @@ require 'afd_parser/trailer'
 
 class AfdParser
   class AfdParserException < Exception; end
-  attr_reader :records
+  attr_reader :records, :header, :trailer
 
   def initialize(*args)
     if args.size == 1
@@ -67,7 +67,8 @@ class AfdParser
 
     case record_type
     when :header
-      @records << Header.new(line)
+      @header = Header.new(line)
+      return @header
     when :set_employer
       @records << SetEmployer.new(line)
       @counter[:set_employer] += 1
@@ -81,21 +82,22 @@ class AfdParser
       @records << SetEmployee.new(line)
       @counter[:set_employee] += 1
     when :trailer
-      @records << Trailer.new(line, @counter)
+      @trailer = Trailer.new(line, @counter)
+      return @trailer
     else
       if @validate_structure
         raise AfdParserException.new("Unknown record type found in AFD file, line #{index.to_s}: '#{line}'")
       end
     end
 
-    @records.last
+    return @records.last
   end
 
   def create_header(employer_type, employer_document, employer_cei, employer_name, rep_serial_number, afd_start_date,afd_end_date, afd_creation_time)
     if header_found?
       raise AfdParserException.new("Cannot add a second AFD header")
     else
-      @records.unshift Header.new(employer_type, employer_document, employer_cei, employer_name, rep_serial_number, afd_start_date,afd_end_date, afd_creation_time)
+      @header = Header.new(employer_type, employer_document, employer_cei, employer_name, rep_serial_number, afd_start_date,afd_end_date, afd_creation_time)
     end
   end
 
@@ -103,21 +105,23 @@ class AfdParser
     if trailer_found?
       raise AfdParserException.new("Cannot add a second AFD trailer")
     else
-      @records << Trailer.new(@counter)
+      @trailer = Trailer.new(@counter)
     end
   end
 
   def export
     exported_data = ""
+    (exported_data += @header.export + "\r\n") if @header
     @records.each do |record|
       exported_data += record.export + "\r\n"
     end
+    (exported_data += @trailer.export + "\r\n") if @trailer
 
     exported_data
   end
 
   def first_creation_date
-    record = @records.detect{|r| r.class != AfdParser::Header && r.class != AfdParser::Trailer}
+    record = @records[0]
     if record
       time = record.creation_time
       return Date.civil(time.year, time.month, time.day)
@@ -125,13 +129,7 @@ class AfdParser
   end
 
   def last_creation_date
-    record = nil
-    @records.reverse_each do |r|
-      if r.class != AfdParser::Header && r.class != AfdParser::Trailer
-        record = r
-        break
-      end
-    end
+    record = @records[-1]
     if record
       time = record.creation_time
       return Date.civil(time.year, time.month, time.day)
@@ -140,6 +138,39 @@ class AfdParser
 
   def ==(other)
     return self.class == other.class && @records == other.records
+  end
+
+  # get the first id after the AFD header
+  def first_id
+    first_record = @records[0]
+    first_record ? first_record.line_id : nil
+  end
+
+  # get the last id before the AFD trailer
+  def last_id
+    last_record = @records[-1]
+    last_record ? last_record.line_id : nil
+  end
+
+  def merge(other)
+    other_first_id, other_last_id = other.first_id, other.last_id
+    if other_first_id.nil? || other_last_id.nil?
+      raise AfdParserException.new("Cannot merge with a empty parser")
+    end
+
+    @header = other.header if other.header
+
+    # merge is done by grouping all the records by line id, and replacing
+    # the ones in "self" by duplicates of the ones in "other".
+    this_records_by_line_id = @records.group_by{|record| record.line_id}
+    other_records_by_line_id = other.records.group_by{|record| record.line_id}
+    other_records_by_line_id.keys.each do |key|
+      this_records_by_line_id[key] = other_records_by_line_id[key].dup
+    end
+    @records = this_records_by_line_id.keys.sort.collect{|key| this_records_by_line_id[key]}.flatten
+
+    @trailer = nil
+    create_trailer
   end
 
   private
@@ -191,10 +222,10 @@ class AfdParser
   end
 
   def header_found?
-    @records.first.class == Header
+    !@header.nil?
   end
 
   def trailer_found?
-    @records.last.class == Trailer
+    !@trailer.nil?
   end
 end
