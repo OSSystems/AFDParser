@@ -27,7 +27,7 @@ class AfdParser
 
     def initialize(line)
       self.line_id, self.record_type_id, self.before_time,
-      self.after_time = line.unpack("A9AA12A12")
+      self.after_time = line.unpack("A9AA12A12").collect{|str| _clean!(str)}
     end
 
     def export

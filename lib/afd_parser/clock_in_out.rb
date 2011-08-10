@@ -25,7 +25,8 @@ class AfdParser
     attr_reader :line_id, :record_type_id, :creation_time, :pis
 
     def initialize(line)
-      self.line_id, self.record_type_id, self.creation_time, self.pis = line.unpack("A9AA12A12")
+      self.line_id, self.record_type_id, self.creation_time, self.pis =
+        line.unpack("A9AA12A12").collect{|str| _clean!(str)}
     end
 
     def export

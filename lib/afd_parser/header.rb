@@ -32,7 +32,8 @@ class AfdParser
 
         self.line_id, self.record_type_id, self.employer_type, self.employer_document,
         self.employer_cei, self.employer_name, self.rep_serial_number, self.afd_start_date,
-        self.afd_end_date, self.afd_creation_time = line.unpack("A9AAA14A12A150A17A8A8A12")
+        self.afd_end_date, self.afd_creation_time =
+          line.unpack("A9AAA14A12A150A17A8A8A12").collect{|str| _clean!(str)}
       elsif args.size == 8
         @line_id           = 0
         @record_type_id    = 1

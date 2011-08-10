@@ -38,7 +38,8 @@ class AfdParser
         line = args[0]
         counter = args[1]
 
-        line_id, set_employer, clock_in_out, set_time, set_employee, record_type_id = line.unpack("A9A9A9A9A9A")
+        line_id, set_employer, clock_in_out, set_time, set_employee,
+        record_type_id = line.unpack("A9A9A9A9A9A").collect{|str| _clean!(str)}
 
         @line_id = line_id.to_i
         @set_employer = set_employer.to_i

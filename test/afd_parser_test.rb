@@ -18,7 +18,7 @@
 # Rua Clóvis Gularte Candiota 132, Pelotas-RS, Brasil.
 # e-mail: contato@ossystems.com.br
 
-require 'test_helper'
+require File.dirname(__FILE__) + '/./test_helper'
 require 'tempfile'
 require 'afd_parser'
 
@@ -560,6 +560,40 @@ class AfdParserTest < Test::Unit::TestCase
     assert_equal 4, parser1.trailer.set_employee
     assert_equal 1, parser1.trailer.set_time
     assert_equal 9, parser1.trailer.record_type_id
+  end
+
+  def test_load_ignoring_invalid_utf_8_data
+    parser = AfdParser.new(true)
+    file = File.open("test/afd_invalid_utf-8_chars", "r")
+    file.readlines.each_with_index do |line, index|
+      parser.parse_line(line, index)
+    end
+
+    parsed_records = parser.records
+    assert_equal 1, parsed_records.size
+
+    assert_equal 0, parser.header.line_id
+    assert_equal 1, parser.header.record_type_id
+    assert_equal :cnpj, parser.header.employer_type
+    assert_equal Time.local(2011,8,5,17,11), parser.header.afd_creation_time
+    assert_equal Date.civil(2011,1,20), parser.header.afd_start_date
+    assert_equal Date.civil(2011,8,5), parser.header.afd_end_date
+    assert_equal "00004000070004403", parser.header.rep_serial_number
+    assert_equal "NOVISSIMA EMPRESA SA.", parser.header.employer_name
+    assert_equal 67890, parser.header.employer_document
+    assert_equal 9876, parser.header.employer_cei
+
+    set_employer = parsed_records[0]
+    assert_equal 11111111111111, set_employer.document_number
+    assert_equal 1, set_employer.line_id
+    assert_equal "INVALID COMPANY ERRORsgf&\001", set_employer.name
+    assert_equal "COMPANY LOCATION WITH ERROR                                                          sgf&\001", set_employer.location
+    assert_equal :cnpj, set_employer.document_type
+    assert_equal Time.local(2011,1,24,16,59), set_employer.creation_time
+    assert_equal 0, set_employer.cei
+    assert_equal 2, set_employer.record_type_id
+
+    assert_nil parser.trailer
   end
 
   private

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Controle de Horas - Sistema para gestão de horas trabalhadas
 # Copyright (C) 2009  O.S. Systems Softwares Ltda.
 
@@ -16,6 +17,8 @@
 
 # Rua Clóvis Gularte Candiota 132, Pelotas-RS, Brasil.
 # e-mail: contato@ossystems.com.br
+
+require "iconv"
 
 class AfdParser
   class RecordParser
@@ -54,6 +57,15 @@ class AfdParser
 
     def well_formed_number_string?(string)
       string.to_i.to_s.rjust(string.size, "0") == string
+    end
+
+    # Destructively removes invalid utf-8 chars from strings. Ignores data from
+    # other classes.
+    def _clean!(string)
+      return string unless string.class == String
+      (@iconv_cleaner = Iconv.new 'UTF-8//IGNORE', 'UTF-8') if @iconv_cleaner.nil?
+      string.replace(@iconv_cleaner.iconv string)
+      string
     end
   end
 end

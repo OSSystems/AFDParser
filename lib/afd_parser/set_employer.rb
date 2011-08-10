@@ -30,7 +30,9 @@ class AfdParser
     def initialize(line)
       self.line_id, self.record_type_id, self.creation_time,
       self.document_type, self.document_number, self.cei, self.name,
-      self.location = line.unpack("A9AA12AA14A12A150A100")
+      self.location = line.unpack("A9AA12AA14A12A150A100").collect do |str|
+        _clean!(str)
+      end
     end
 
     def export
