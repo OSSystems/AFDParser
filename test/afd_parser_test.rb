@@ -554,9 +554,9 @@ class AfdParserTest < Test::Unit::TestCase
     assert_equal Time.local(2011,8,5,11,34), clock_in_out.creation_time
     assert_equal 3, clock_in_out.record_type_id
 
-    assert_equal 3, parser1.trailer.clock_in_out
+    assert_equal 4, parser1.trailer.clock_in_out
     assert_equal 999999999, parser1.trailer.line_id
-    assert_equal 1, parser1.trailer.set_employer
+    assert_equal 2, parser1.trailer.set_employer
     assert_equal 4, parser1.trailer.set_employee
     assert_equal 1, parser1.trailer.set_time
     assert_equal 9, parser1.trailer.record_type_id

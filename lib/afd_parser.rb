@@ -71,18 +71,14 @@ class AfdParser
       return @header
     when :set_employer
       @records << SetEmployer.new(line)
-      @counter[:set_employer] += 1
     when :clock_in_out
       @records << ClockInOut.new(line)
-      @counter[:clock_in_out] += 1
     when :set_time
       @records << SetTime.new(line)
-      @counter[:set_time] += 1
     when :set_employee
       @records << SetEmployee.new(line)
-      @counter[:set_employee] += 1
     when :trailer
-      @trailer = Trailer.new(line, @counter)
+      @trailer = Trailer.new(line, count_records)
       return @trailer
     else
       if @validate_structure
@@ -105,7 +101,7 @@ class AfdParser
     if trailer_found?
       raise AfdParserException.new("Cannot add a second AFD trailer")
     else
-      @trailer = Trailer.new(@counter)
+      @trailer = Trailer.new(count_records)
     end
   end
 
@@ -176,7 +172,6 @@ class AfdParser
   private
   def initialize_variables(validate_structure)
     @records = []
-    @counter = {:set_employer => 0, :clock_in_out => 0, :set_time => 0, :set_employee => 0}
     @validate_structure = validate_structure
   end
 
@@ -227,5 +222,22 @@ class AfdParser
 
   def trailer_found?
     !@trailer.nil?
+  end
+
+  def count_records
+    counter = {:set_employer => 0, :clock_in_out => 0, :set_time => 0, :set_employee => 0}
+    @records.each do |record|
+      case record
+      when *SetEmployer
+        counter[:set_employer] += 1
+      when *ClockInOut
+        counter[:clock_in_out] += 1
+      when *SetTime
+        counter[:set_time] += 1
+      when *SetEmployee
+        counter[:set_employee] += 1
+      end
+    end
+    return counter
   end
 end
