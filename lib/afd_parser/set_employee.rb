@@ -20,80 +20,78 @@
 
 require 'afd_parser/record_parser'
 
-class AfdParser
-  class SetEmployee < RecordParser
-    attr_reader :line_id, :record_type_id, :creation_time, :operation_type,
-    :pis, :name
+class AfdParser::SetEmployee < AfdParser::RecordParser
+  attr_reader :line_id, :record_type_id, :creation_time, :operation_type,
+  :pis, :name
 
-    OPERATION_TYPE = {"I" => :add, "A" => :edit, "E" => :remove}
+  OPERATION_TYPE = {"I" => :add, "A" => :edit, "E" => :remove}
 
-    def initialize(line)
-      self.line_id, self.record_type_id, self.creation_time,
-      self.operation_type, self.pis, self.name =
-        line.unpack("A9AA12AA12A52").collect{|str| _clean!(str)}
+  def initialize(line)
+    self.line_id, self.record_type_id, self.creation_time,
+    self.operation_type, self.pis, self.name =
+      line.unpack("A9AA12AA12A52").collect{|str| _clean!(str)}
+  end
+
+  def export
+    line_export = ""
+    line_export += @line_id.to_s.rjust(9,"0")
+    line_export += @record_type_id.to_s
+    line_export += format_time(@creation_time)
+    line_export += get_operation_letter(@operation_type).to_s
+    line_export += @pis.to_s
+    line_export += @name.ljust(52, " ")
+    line_export
+  end
+
+  def self.size
+    87
+  end
+
+  def ==(other)
+    return self.class == other.class && [:line_id, :record_type_id, :creation_time, :operation_type, :pis, :name].all? do |reader|
+      self.send(reader) == other.send(reader)
     end
+  end
 
-    def export
-      line_export = ""
-      line_export += @line_id.to_s.rjust(9,"0")
-      line_export += @record_type_id.to_s
-      line_export += format_time(@creation_time)
-      line_export += get_operation_letter(@operation_type).to_s
-      line_export += @pis.to_s
-      line_export += @name.ljust(52, " ")
-      line_export
-    end
+  private
+  def line_id=(data)
+    @line_id = well_formed_number_string?(data) ? data.to_i : data
+  end
 
-    def self.size
-      87
-    end
+  def record_type_id=(data)
+    @record_type_id = well_formed_number_string?(data) ? data.to_i : data
+  end
 
-    def ==(other)
-      return self.class == other.class && [:line_id, :record_type_id, :creation_time, :operation_type, :pis, :name].all? do |reader|
-        self.send(reader) == other.send(reader)
-      end
-    end
+  def pis=(data)
+    @pis = well_formed_number_string?(data) ? data.to_i : data
+  end
 
-    private
-    def line_id=(data)
-      @line_id = well_formed_number_string?(data) ? data.to_i : data
-    end
+  def operation_type=(data)
+    @operation_type = get_operation_type(data)
+  end
 
-    def record_type_id=(data)
-      @record_type_id = well_formed_number_string?(data) ? data.to_i : data
-    end
+  def name=(data)
+    @name = data.rstrip
+  end
 
-    def pis=(data)
-      @pis = well_formed_number_string?(data) ? data.to_i : data
+  def creation_time=(raw_time)
+    begin
+      parsed_time = parse_time(raw_time)
+      @creation_time = parsed_time
+    rescue
+      @creation_time = ""
     end
+  end
 
-    def operation_type=(data)
-      @operation_type = get_operation_type(data)
+  def get_operation_type(operation_type_letter)
+    type = OPERATION_TYPE[operation_type_letter]
+    if type.nil?
+      raise AfdParser::AfdParserException.new("Unknown employee operation type letter '#{operation_type_letter}' found in line #{@line_id.to_s}")
     end
+    type
+  end
 
-    def name=(data)
-      @name = data.rstrip
-    end
-
-    def creation_time=(raw_time)
-      begin
-        parsed_time = parse_time(raw_time)
-        @creation_time = parsed_time
-      rescue
-        @creation_time = ""
-      end
-    end
-
-    def get_operation_type(operation_type_letter)
-      type = OPERATION_TYPE[operation_type_letter]
-      if type.nil?
-        raise AfdParserException.new("Unknown employee operation type letter '#{operation_type_letter}' found in line #{@line_id.to_s}")
-      end
-      type
-    end
-
-    def get_operation_letter(operation_type)
-      OPERATION_TYPE.invert[operation_type]
-    end
+  def get_operation_letter(operation_type)
+    OPERATION_TYPE.invert[operation_type]
   end
 end

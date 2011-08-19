@@ -20,66 +20,64 @@
 
 require 'afd_parser/record_parser'
 
-class AfdParser
-  class Trailer < RecordParser
-    attr_reader :line_id, :set_employer, :clock_in_out, :set_time, :set_employee, :record_type_id
+class AfdParser::Trailer < AfdParser::RecordParser
+  attr_reader :line_id, :set_employer, :clock_in_out, :set_time, :set_employee, :record_type_id
 
-    def initialize(*args)
-      if args.size == 1
-        counter = args[0]
-        @line_id = 999999999
-        @set_employer = counter[:set_employer]
-        @clock_in_out = counter[:clock_in_out]
-        @set_time = counter[:set_time]
-        @set_employee = counter[:set_employee]
-        @record_type_id = 9
+  def initialize(*args)
+    if args.size == 1
+      counter = args[0]
+      @line_id = 999999999
+      @set_employer = counter[:set_employer]
+      @clock_in_out = counter[:clock_in_out]
+      @set_time = counter[:set_time]
+      @set_employee = counter[:set_employee]
+      @record_type_id = 9
 
-      elsif args.size == 2
-        line = args[0]
-        counter = args[1]
+    elsif args.size == 2
+      line = args[0]
+      counter = args[1]
 
-        line_id, set_employer, clock_in_out, set_time, set_employee,
-        record_type_id = line.unpack("A9A9A9A9A9A").collect{|str| _clean!(str)}
+      line_id, set_employer, clock_in_out, set_time, set_employee,
+      record_type_id = line.unpack("A9A9A9A9A9A").collect{|str| _clean!(str)}
 
-        @line_id = line_id.to_i
-        @set_employer = set_employer.to_i
-        @clock_in_out = clock_in_out.to_i
-        @set_time = set_time.to_i
-        @set_employee = set_employee.to_i
-        @record_type_id = record_type_id.to_i
+      @line_id = line_id.to_i
+      @set_employer = set_employer.to_i
+      @clock_in_out = clock_in_out.to_i
+      @set_time = set_time.to_i
+      @set_employee = set_employee.to_i
+      @record_type_id = record_type_id.to_i
 
-        ["set_employer", "clock_in_out", "set_time", "set_employee"].each do |key|
-          value = eval("@"+key)
-          if value != counter[key.to_sym]
-            raise AfdParserException.new("Mismatch counting changes of #{key} in REP!\n" +
-                                         "REP: #{value.to_s} | System: #{counter[key.to_sym].to_s}")
-          end
+      ["set_employer", "clock_in_out", "set_time", "set_employee"].each do |key|
+        value = eval("@"+key)
+        if value != counter[key.to_sym]
+          raise AfdParser::AfdParserException.new("Mismatch counting changes of #{key} in REP!\n" +
+                                       "REP: #{value.to_s} | System: #{counter[key.to_sym].to_s}")
         end
-
-      else
-        raise AfdParserException.new("wrong number of arguments for trailer object, should be 1 or 2")
       end
-    end
 
-    def export
-      line_export = ""
-      line_export += @line_id.to_s.rjust(9,"0")
-      line_export += @set_employer.to_s.rjust(9,"0")
-      line_export += @clock_in_out.to_s.rjust(9,"0")
-      line_export += @set_time.to_s.rjust(9,"0")
-      line_export += @set_employee.to_s.rjust(9,"0")
-      line_export += @record_type_id.to_s
-      line_export
+    else
+      raise AfdParser::AfdParserException.new("wrong number of arguments for trailer object, should be 1 or 2")
     end
+  end
 
-    def self.time
-      46
-    end
+  def export
+    line_export = ""
+    line_export += @line_id.to_s.rjust(9,"0")
+    line_export += @set_employer.to_s.rjust(9,"0")
+    line_export += @clock_in_out.to_s.rjust(9,"0")
+    line_export += @set_time.to_s.rjust(9,"0")
+    line_export += @set_employee.to_s.rjust(9,"0")
+    line_export += @record_type_id.to_s
+    line_export
+  end
 
-    def ==(other)
-      return self.class == other.class && [:line_id, :set_employer, :clock_in_out, :set_time, :set_employee, :record_type_id].all? do |reader|
-        self.send(reader) == other.send(reader)
-      end
+  def self.time
+    46
+  end
+
+  def ==(other)
+    return self.class == other.class && [:line_id, :set_employer, :clock_in_out, :set_time, :set_employee, :record_type_id].all? do |reader|
+      self.send(reader) == other.send(reader)
     end
   end
 end

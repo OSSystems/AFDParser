@@ -20,17 +20,17 @@
 
 require 'date'
 
-require 'afd_parser/clock_in_out'
-require 'afd_parser/header'
-require 'afd_parser/set_employee'
-require 'afd_parser/set_employer'
-require 'afd_parser/set_time'
-require 'afd_parser/trailer'
-
 # Parser para a PORTARIA No 1.510, DE 21 DE AGOSTO DE 2009, do
 # Ministério do Trabalho;
 
 class AfdParser
+  require 'afd_parser/clock_in_out'
+  require 'afd_parser/header'
+  require 'afd_parser/set_employee'
+  require 'afd_parser/set_employer'
+  require 'afd_parser/set_time'
+  require 'afd_parser/trailer'
+
   class AfdParserException < Exception; end
   attr_reader :records, :header, :trailer
 
@@ -43,7 +43,7 @@ class AfdParser
         @raw_data = file.readlines
       end
     else
-      raise AfdParserException.new("wrong number of arguments, should be 1 or 2")
+      raise AfdParser::AfdParserException.new("wrong number of arguments, should be 1 or 2")
     end
   end
 
@@ -53,7 +53,7 @@ class AfdParser
     end
 
     if @validate_structure and not trailer_found?
-      raise AfdParserException.new("AFD ended without a trailer record")
+      raise AfdParser::AfdParserException.new("AFD ended without a trailer record")
     end
   end
 
@@ -82,7 +82,7 @@ class AfdParser
       return @trailer
     else
       if @validate_structure
-        raise AfdParserException.new("Unknown record type found in AFD file, line #{index.to_s}: '#{line}'")
+        raise AfdParser::AfdParserException.new("Unknown record type found in AFD file, line #{index.to_s}: '#{line}'")
       end
     end
 
@@ -91,7 +91,7 @@ class AfdParser
 
   def create_header(employer_type, employer_document, employer_cei, employer_name, rep_serial_number, afd_start_date,afd_end_date, afd_creation_time)
     if header_found?
-      raise AfdParserException.new("Cannot add a second AFD header")
+      raise AfdParser::AfdParserException.new("Cannot add a second AFD header")
     else
       @header = Header.new(employer_type, employer_document, employer_cei, employer_name, rep_serial_number, afd_start_date,afd_end_date, afd_creation_time)
     end
@@ -99,7 +99,7 @@ class AfdParser
 
   def create_trailer
     if trailer_found?
-      raise AfdParserException.new("Cannot add a second AFD trailer")
+      raise AfdParser::AfdParserException.new("Cannot add a second AFD trailer")
     else
       @trailer = Trailer.new(count_records)
     end
@@ -151,7 +151,7 @@ class AfdParser
   def merge(other)
     other_first_id, other_last_id = other.first_id, other.last_id
     if other_first_id.nil? || other_last_id.nil?
-      raise AfdParserException.new("Cannot merge with a empty parser")
+      raise AfdParser::AfdParserException.new("Cannot merge with a empty parser")
     end
 
     @header = other.header if other.header
@@ -197,22 +197,22 @@ class AfdParser
   end
 
   def validate_afd(line, line_id, index, record_type)
-    raise AfdParserException.new("Line #{index.to_s} is blank") if line.nil? || line.empty?
+    raise AfdParser::AfdParserException.new("Line #{index.to_s} is blank") if line.nil? || line.empty?
 
     if line_id != index and not (line_id == 999999999 and not trailer_found?)
-      raise AfdParserException.new("Out-of-order line id on line 1; expected '#{index.to_s}', got '#{line_id.to_s}'")
+      raise AfdParser::AfdParserException.new("Out-of-order line id on line 1; expected '#{index.to_s}', got '#{line_id.to_s}'")
     end
 
     if trailer_found?
-      raise AfdParserException.new("Unexpected AFD record found after trailer, line #{index.to_s}: '#{line}'")
+      raise AfdParser::AfdParserException.new("Unexpected AFD record found after trailer, line #{index.to_s}: '#{line}'")
     end
 
     if not header_found? and record_type != :header
-      raise AfdParserException.new("Unexpected AFD record found before header, line #{index.to_s}: '#{line}'")
+      raise AfdParser::AfdParserException.new("Unexpected AFD record found before header, line #{index.to_s}: '#{line}'")
     end
 
     if header_found? and record_type == :header
-      raise AfdParserException.new("Unexpected second AFD header found, line #{index.to_s}: '#{line}'")
+      raise AfdParser::AfdParserException.new("Unexpected second AFD header found, line #{index.to_s}: '#{line}'")
     end
   end
 
