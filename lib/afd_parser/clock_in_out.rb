@@ -57,7 +57,7 @@ class AfdParser::ClockInOut < AfdParser::RecordParser
   end
 
   def pis=(data)
-    @pis = well_formed_number_string?(data) ? data.to_i : data
+    @pis = well_formed_number_string?(data.strip) ? data.to_i : data
   end
 
   def creation_time=(raw_time)
