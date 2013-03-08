@@ -18,8 +18,6 @@
 # Rua Clóvis Gularte Candiota 132, Pelotas-RS, Brasil.
 # e-mail: contato@ossystems.com.br
 
-require "iconv"
-
 class AfdParser::RecordParser
   def self.size
     raise "record size not defined for parser class '#{self.class.to_s}'"
@@ -62,8 +60,6 @@ class AfdParser::RecordParser
   # other classes.
   def _clean!(string)
     return string unless string.class == String
-    (@iconv_cleaner = Iconv.new 'UTF-8//IGNORE', 'UTF-8') if @iconv_cleaner.nil?
-    string.replace(@iconv_cleaner.iconv string)
-    string
+    string.encode(Encoding::UTF_8, Encoding::ASCII, {:invalid => :replace, :replace => ""})
   end
 end
