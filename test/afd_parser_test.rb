@@ -18,7 +18,7 @@
 # Rua Clóvis Gularte Candiota 132, Pelotas-RS, Brasil.
 # e-mail: contato@ossystems.com.br
 
-require File.dirname(__FILE__) + '/./test_helper'
+require 'test_helper'
 require 'tempfile'
 require 'afd_parser'
 
