@@ -1,3 +1,7 @@
+## AFDParser 0.1.1 ##
+
+*   Fixed PIS code size interpretation;
+
 ## AFDParser 0.1.0 ##
 
 *   Upgraded to Ruby 2.0.0.
