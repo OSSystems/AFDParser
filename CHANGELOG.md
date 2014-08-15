@@ -1,3 +1,8 @@
+## AFDParser 0.1.2 ##
+
+*   Fix encoding error;
+*   Upgraded gems;
+
 ## AFDParser 0.1.1 ##
 
 *   Fixed PIS code size interpretation;
