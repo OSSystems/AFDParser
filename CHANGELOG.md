@@ -1,3 +1,7 @@
+## AFDParser 0.1.3 ##
+
+*   Clean SetEmployee name records
+
 ## AFDParser 0.1.2 ##
 
 *   Fix encoding error;
