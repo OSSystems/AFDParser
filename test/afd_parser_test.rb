@@ -586,8 +586,8 @@ class AfdParserTest < Test::Unit::TestCase
     set_employer = parsed_records[0]
     assert_equal 11111111111111, set_employer.document_number
     assert_equal 1, set_employer.line_id
-    assert_equal "INVALID COMPANY ERRORsgf&\001", set_employer.name
-    assert_equal "COMPANY LOCATION WITH ERROR                                                          sgf&\001", set_employer.location
+    assert_equal "INVALID COMPANY ERRORs\u0087¼g¾\u008F¢ñöÊf\u008F&\u0001þ", set_employer.name
+    assert_equal "COMPANY LOCATION WITH ERROR                                                          s\u0087¼g¾\u008F¢ñöÊf\u008F&\u0001þ", set_employer.location
     assert_equal :cnpj, set_employer.document_type
     assert_equal Time.local(2011,1,24,16,59), set_employer.creation_time
     assert_equal 0, set_employer.cei

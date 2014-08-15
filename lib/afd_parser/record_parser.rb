@@ -60,6 +60,6 @@ class AfdParser::RecordParser
   # other classes.
   def _clean!(string)
     return string unless string.class == String
-    string.encode(Encoding::UTF_8, Encoding::ASCII, {:invalid => :replace, :replace => ""})
+    string.force_encoding('ISO-8859-1').encode('UTF-8', {:invalid => :replace, :replace => ""})
   end
 end
