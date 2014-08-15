@@ -30,7 +30,7 @@ class AfdParser::SetEmployee < AfdParser::RecordParser
     self.line_id, self.record_type_id, self.creation_time,
     self.operation_type =
       line.unpack("A9AA12A").collect{|str| _clean!(str)}
-    self.pis, self.name = line[23..-1].match(/\A(\d{1,12})(.{1,52})/)[1..2]
+    self.pis, self.name = line[23..-1].match(/\A(\d{1,12})(.{1,52})/)[1..2].collect{|str| _clean!(str)}
   end
 
   def export

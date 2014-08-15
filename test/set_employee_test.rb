@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 require 'test_helper'
 require 'afd_parser'
 
@@ -29,6 +30,15 @@ class SetEmployeeTest < Test::Unit::TestCase
     assert_equal DateTime.civil(2011,2,8,19,9).to_time, record.creation_time
     assert_equal :add, record.operation_type
     assert_equal "FULANO DE TAL", record.name
+
+    # with non-ASCII chars:
+    record = AfdParser::SetEmployee.new("0000000045080220111709I22222222222FUL\xC3NO DE TAL                                       ".force_encoding("ISO-8859-1"))
+    assert_equal 22222222222, record.pis
+    assert_equal 4, record.line_id
+    assert_equal 5, record.record_type_id
+    assert_equal DateTime.civil(2011,2,8,19,9).to_time, record.creation_time
+    assert_equal :add, record.operation_type
+    assert_equal "FULÃNO DE TAL", record.name
   end
 
   def test_equal
