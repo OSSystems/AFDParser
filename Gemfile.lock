@@ -1,25 +1,22 @@
 PATH
   remote: .
   specs:
-    afd_parser (0.1.0)
+    afd_parser (0.1.1)
       rake (>= 0.8.7)
 
 GEM
   remote: http://rubygems.org/
   specs:
-    columnize (0.3.6)
-    debugger (1.4.0)
-      columnize (>= 0.3.1)
-      debugger-linecache (~> 1.1.1)
-      debugger-ruby_core_source (~> 1.2.0)
-    debugger-linecache (1.1.2)
-      debugger-ruby_core_source (>= 1.1.1)
-    debugger-ruby_core_source (1.2.0)
-    rake (10.0.3)
+    byebug (3.2.0)
+      columnize (~> 0.8)
+      debugger-linecache (~> 1.2)
+    columnize (0.8.9)
+    debugger-linecache (1.2.0)
+    rake (10.3.1)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
   afd_parser!
-  debugger
+  byebug
