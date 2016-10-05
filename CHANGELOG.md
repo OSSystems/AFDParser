@@ -1,3 +1,8 @@
+## AFDParser 0.1.5 ##
+
+*   Fix warnings when testing
+*   Fix exporting when using headers with corrupted data
+
 ## AFDParser 0.1.4 ##
 
 *   Make corrupt date parsing more fault tolerant for headers
