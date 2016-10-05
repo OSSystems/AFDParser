@@ -34,5 +34,14 @@ class HeaderTest < Test::Unit::TestCase
 
     # different afd creation time:
     assert !(AfdParser::Header.new(TEMPLATE) == AfdParser::Header.new("0000000001200000000067890000000009876RAZAO_SOCIAL                                                                                                                                          000040000700044032001201122022011210220121048"))
+
+  end
+
+  def test_corrupted_date_parsing
+    # corrupted times:
+    header = AfdParser::Header.new("0000000001200000000067890000000009876RAZAO_SOCIAL                                                                                                                                          000040000700044034001201132022011320220121048")
+    assert_equal '40012011', header.afd_start_date
+    assert_equal '32022011', header.afd_end_date
+    assert_equal '320220121048', header.afd_creation_time
   end
 end

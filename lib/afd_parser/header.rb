@@ -108,7 +108,7 @@ class AfdParser::Header < AfdParser::RecordParser
       parsed_date = parse_date(raw_date)
       @afd_start_date = parsed_date
     rescue
-      @afd_start_date = ""
+      @afd_start_date = raw_date
     end
   end
 
@@ -117,7 +117,7 @@ class AfdParser::Header < AfdParser::RecordParser
       parsed_date = parse_date(raw_date)
       @afd_end_date = parsed_date
     rescue
-      @afd_end_date = ""
+      @afd_end_date = raw_date
     end
   end
 
@@ -126,7 +126,7 @@ class AfdParser::Header < AfdParser::RecordParser
       parsed_time = parse_time(raw_time)
       @afd_creation_time = parsed_time
     rescue
-      @afd_creation_time = ""
+      @afd_creation_time = raw_time
     end
   end
 
