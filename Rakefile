@@ -1,3 +1,4 @@
+# coding: utf-8
 # Controle de Horas - Sistema para gestão de horas trabalhadas
 # Copyright (C) 2009  O.S. Systems Softwares Ltda.
 
@@ -28,4 +29,5 @@ task :default => :test
 Rake::TestTask.new(:test) do |t|
   t.libs << 'test'
   t.pattern = 'test/**/*_test.rb'
+  t.warning = false
 end
