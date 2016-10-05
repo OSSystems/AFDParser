@@ -44,4 +44,9 @@ class HeaderTest < Test::Unit::TestCase
     assert_equal '32022011', header.afd_end_date
     assert_equal '320220121048', header.afd_creation_time
   end
+
+  def test_corrupted_date_exporting
+    header = AfdParser::Header.new("0000000001200000000067890000000009876RAZAO_SOCIAL                                                                                                                                          000040000700044034001201132022011320220121048")
+    assert_equal '0000000001200000000067890000000009876RAZAO_SOCIAL                                                                                                                                          000040000700044034001201132022011320220121048', header.export
+  end
 end

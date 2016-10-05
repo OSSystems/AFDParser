@@ -45,11 +45,11 @@ class AfdParser::RecordParser
   end
 
   def format_date(date)
-    date.strftime("%d%m%Y")
+    date.class == Date ? date.strftime("%d%m%Y") : date.to_s
   end
 
   def format_time(time)
-    time.strftime("%d%m%Y%H%M")
+    time.class == Time ? time.strftime("%d%m%Y%H%M") : time.to_s
   end
 
   def well_formed_number_string?(string)
