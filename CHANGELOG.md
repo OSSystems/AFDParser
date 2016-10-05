@@ -1,3 +1,7 @@
+## AFDParser 0.1.4 ##
+
+*   Make corrupt date parsing more fault tolerant for headers
+
 ## AFDParser 0.1.3 ##
 
 *   Clean SetEmployee name records
