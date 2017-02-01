@@ -61,8 +61,11 @@ class AfdParser
     line_id, record_type_id = line.unpack("A9A").collect{|id| id.to_i}
     record_type = get_record_type(line_id, record_type_id, line)
 
+    @previous_line_id = @current_line_id unless @current_line_id == 0
+    @current_line_id = line_id
+
     if @validate_structure
-      validate_afd(line, line_id, index, record_type)
+      validate_afd(line, line_id, @previous_line_id, index, record_type)
     end
 
     case record_type
@@ -170,9 +173,16 @@ class AfdParser
   end
 
   private
-  def initialize_variables(validate_structure)
+  def initialize_variables(options)
     @records = []
-    @validate_structure = validate_structure
+    @current_line_id = nil
+    @previous_line_id = nil
+    if options.is_a?(Hash)
+      @validate_structure = options[:validate_structure]
+      @validate_expected_afd_records_ids = options[:validate_expected_afd_records_ids]
+    else
+      @validate_expected_afd_records_ids = @validate_structure = !!options
+    end
   end
 
   def get_record_type(line_id, record_type_id, line)
@@ -196,12 +206,8 @@ class AfdParser
     return nil
   end
 
-  def validate_afd(line, line_id, index, record_type)
+  def validate_afd(line, line_id, previous_line_id, index, record_type)
     raise AfdParser::AfdParserException.new("Line #{index.to_s} is blank") if line.nil? || line.empty?
-
-    if line_id != index and not (line_id == 999999999 and not trailer_found?)
-      raise AfdParser::AfdParserException.new("Out-of-order line id on line 1; expected '#{index.to_s}', got '#{line_id.to_s}'")
-    end
 
     if trailer_found?
       raise AfdParser::AfdParserException.new("Unexpected AFD record found after trailer, line #{index.to_s}: '#{line}'")
@@ -213,6 +219,14 @@ class AfdParser
 
     if header_found? and record_type == :header
       raise AfdParser::AfdParserException.new("Unexpected second AFD header found, line #{index.to_s}: '#{line}'")
+    end
+
+    if @validate_expected_afd_records_ids and previous_line_id.nil? and index == 1 and line_id != index
+      raise AfdParser::AfdParserException.new("AFD records starts at an unexpected line ID; expected '1', got '#{line_id.to_s}'.")
+    end
+
+    if not previous_line_id.nil? and line_id != previous_line_id + 1 and not (line_id == 999999999 and not trailer_found?)
+      raise AfdParser::AfdParserException.new("Out-of-order line id on line 1; expected '#{index.to_s}', got '#{line_id.to_s}'")
     end
   end
 

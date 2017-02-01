@@ -166,6 +166,33 @@ class AfdParserTest < Test::Unit::TestCase
 
   def test_reject_file_with_out_of_order_line_ids
     data = "0000000001100000000067890000000009876RAZAO_SOCIAL                                                                                                                                          000040000700044032001201122022011210220111048\n" +
+      "0000000014280120111112280120111113\n" +
+      "0000000032270120111756108682040000172000000000000O.S. SYSTEMS SOFTWARES LTDA.                                                                                                                          PELOTAS - RS                                                                                        \n" +
+      "9999999990000000010000000030000000010000000049"
+
+    file_path = create_temp_afd_file(data)
+    exception = assert_raise AfdParser::AfdParserException do
+      parser = AfdParser.new(file_path, true)
+      parser.parse
+      parsed_records = parser.records
+    end
+    assert_equal "Out-of-order line id on line 1; expected '2', got '3'", exception.message
+  end
+
+  def test_accept_file_with_unexpected_line_id_start_if_option_is_provided
+    data = "0000000001100000000067890000000009876RAZAO_SOCIAL                                                                                                                                          000040000700044032001201122022011210220111048\r\n" +
+      "0000000024280120111112280120111113\r\n" +
+      "0000000032270120111756108682040000172000000000000O.S. SYSTEMS SOFTWARES LTDA.                                                                                                                          PELOTAS - RS                                                                                        \r\n" +
+      "9999999990000000010000000000000000010000000009\r\n"
+
+    file_path = create_temp_afd_file(data)
+    parser = AfdParser.new(file_path, {validate_expected_afd_records_ids: false, validate_structure: true})
+    parser.parse
+    assert_equal data, parser.export
+  end
+
+  def test_reject_file_with_unexpected_line_id_start
+    data = "0000000001100000000067890000000009876RAZAO_SOCIAL                                                                                                                                          000040000700044032001201122022011210220111048\n" +
       "0000000024280120111112280120111113\n" +
       "0000000012270120111756108682040000172000000000000O.S. SYSTEMS SOFTWARES LTDA.                                                                                                                          PELOTAS - RS                                                                                        \n" +
       "9999999990000000010000000030000000010000000049"
@@ -176,7 +203,7 @@ class AfdParserTest < Test::Unit::TestCase
       parser.parse
       parsed_records = parser.records
     end
-    assert_equal "Out-of-order line id on line 1; expected '1', got '2'", exception.message
+    assert_equal "AFD records starts at an unexpected line ID; expected '1', got '2'.", exception.message
   end
 
   def test_reject_file_with_unknown_record_type
