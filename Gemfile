@@ -18,10 +18,9 @@
 # Rua Clóvis Gularte Candiota 132, Pelotas-RS, Brasil.
 # e-mail: contato@ossystems.com.br
 
-source 'http://rubygems.org'
-
-gemspec
+source 'https://rubygems.org'
 
 group :development, :test do
-  gem "byebug"
+  gem 'rake'
+  gem 'byebug'
 end
