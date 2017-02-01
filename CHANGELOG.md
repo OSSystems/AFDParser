@@ -1,3 +1,8 @@
+## AFDParser 0.1.6 ##
+
+*   Upgrade project gems
+*   Add specific validation option for the parser
+
 ## AFDParser 0.1.5 ##
 
 *   Fix warnings when testing
