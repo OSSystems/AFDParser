@@ -1,3 +1,8 @@
+## AFDParser 0.2.0 ##
+
+*   Upgrade project gems
+*   Add option to ignore starting ID of an AFD
+
 ## AFDParser 0.1.6 ##
 
 *   Upgrade project gems
