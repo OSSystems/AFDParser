@@ -1,3 +1,7 @@
+## AFDParser 0.2.1 ##
+
+*   Upgrade project gems
+
 ## AFDParser 0.2.0 ##
 
 *   Upgrade project gems
