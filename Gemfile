@@ -23,4 +23,5 @@ source 'https://rubygems.org'
 group :development, :test do
   gem 'rake'
   gem 'byebug'
+  gem 'test-unit', '>= 1.2.3'
 end

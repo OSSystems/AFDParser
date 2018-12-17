@@ -1,3 +1,4 @@
+# coding: utf-8
 # Controle de Horas - Sistema para gestão de horas trabalhadas
 # Copyright (C) 2009  O.S. Systems Softwares Ltda.
 
@@ -19,7 +20,7 @@
 
 $LOAD_PATH << File.join(File.dirname(__FILE__), '..', 'lib')
 
-require 'test/unit'
+require 'test-unit'
 
 class Test::Unit::TestCase
 end
