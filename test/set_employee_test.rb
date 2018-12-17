@@ -4,12 +4,14 @@ require 'afd_parser'
 
 class SetEmployeeTest < Test::Unit::TestCase
   def test_parsing
+    offset = Time.now.utc_offset
+
     # normal 12 digits:
     record = AfdParser::SetEmployee.new("0000000045080220111709I222222222222FULANO DE TAL                                       ")
     assert_equal 222222222222, record.pis
     assert_equal 4, record.line_id
     assert_equal 5, record.record_type_id
-    assert_equal DateTime.civil(2011,2,8,19,9).to_time.utc, record.creation_time.utc
+    assert_equal (DateTime.civil(2011,2,8,17,9).to_time.utc - offset), record.creation_time.utc
     assert_equal :add, record.operation_type
     assert_equal "FULANO DE TAL", record.name
 
@@ -18,7 +20,7 @@ class SetEmployeeTest < Test::Unit::TestCase
     assert_equal 22222222222, record.pis
     assert_equal 4, record.line_id
     assert_equal 5, record.record_type_id
-    assert_equal DateTime.civil(2011,2,8,19,9).to_time.utc, record.creation_time.utc
+    assert_equal (DateTime.civil(2011,2,8,17,9).to_time.utc - offset), record.creation_time.utc
     assert_equal :add, record.operation_type
     assert_equal "FULANO DE TAL", record.name
 
@@ -27,7 +29,7 @@ class SetEmployeeTest < Test::Unit::TestCase
     assert_equal 0, record.pis
     assert_equal 4, record.line_id
     assert_equal 5, record.record_type_id
-    assert_equal DateTime.civil(2011,2,8,19,9).to_time.utc, record.creation_time.utc
+    assert_equal (DateTime.civil(2011,2,8,17,9).to_time.utc - offset), record.creation_time.utc
     assert_equal :add, record.operation_type
     assert_equal "FULANO DE TAL", record.name
 
@@ -36,7 +38,7 @@ class SetEmployeeTest < Test::Unit::TestCase
     assert_equal 22222222222, record.pis
     assert_equal 4, record.line_id
     assert_equal 5, record.record_type_id
-    assert_equal DateTime.civil(2011,2,8,19,9).to_time.utc, record.creation_time.utc
+    assert_equal (DateTime.civil(2011,2,8,17,9).to_time.utc - offset), record.creation_time.utc
     assert_equal :add, record.operation_type
     assert_equal "FULÃNO DE TAL", record.name
   end
