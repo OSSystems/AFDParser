@@ -9,7 +9,7 @@ class SetEmployeeTest < Test::Unit::TestCase
     assert_equal 222222222222, record.pis
     assert_equal 4, record.line_id
     assert_equal 5, record.record_type_id
-    assert_equal DateTime.civil(2011,2,8,19,9).to_time, record.creation_time
+    assert_equal DateTime.civil(2011,2,8,19,9).to_time.utc, record.creation_time.utc
     assert_equal :add, record.operation_type
     assert_equal "FULANO DE TAL", record.name
 
@@ -18,7 +18,7 @@ class SetEmployeeTest < Test::Unit::TestCase
     assert_equal 22222222222, record.pis
     assert_equal 4, record.line_id
     assert_equal 5, record.record_type_id
-    assert_equal DateTime.civil(2011,2,8,19,9).to_time, record.creation_time
+    assert_equal DateTime.civil(2011,2,8,19,9).to_time.utc, record.creation_time.utc
     assert_equal :add, record.operation_type
     assert_equal "FULANO DE TAL", record.name
 
@@ -27,7 +27,7 @@ class SetEmployeeTest < Test::Unit::TestCase
     assert_equal 0, record.pis
     assert_equal 4, record.line_id
     assert_equal 5, record.record_type_id
-    assert_equal DateTime.civil(2011,2,8,19,9).to_time, record.creation_time
+    assert_equal DateTime.civil(2011,2,8,19,9).to_time.utc, record.creation_time.utc
     assert_equal :add, record.operation_type
     assert_equal "FULANO DE TAL", record.name
 
@@ -36,7 +36,7 @@ class SetEmployeeTest < Test::Unit::TestCase
     assert_equal 22222222222, record.pis
     assert_equal 4, record.line_id
     assert_equal 5, record.record_type_id
-    assert_equal DateTime.civil(2011,2,8,19,9).to_time, record.creation_time
+    assert_equal DateTime.civil(2011,2,8,19,9).to_time.utc, record.creation_time.utc
     assert_equal :add, record.operation_type
     assert_equal "FULÃNO DE TAL", record.name
   end
